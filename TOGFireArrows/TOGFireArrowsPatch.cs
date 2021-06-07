@@ -78,25 +78,37 @@ namespace TOGFireArrows
                     ControllerInput Controllers =
                         __instance.GetType().GetField("Controllers", bindFlags).GetValue(__instance) as ControllerInput;
 
-                    var controller = __instance.wp.isHeldRight
+                    var playerController = __instance.wp.isHeldRight
                         ? Controllers.RightController
                         : Controllers.LeftController;
 
-                    if (!stats.config.gameObject.GetComponent<FireArrowController>().triggerPressed &&
-                        controller.triggerPressed)
+                    var fireArrowController = stats.config.gameObject.GetComponent<FireArrowController>();
+                    if (!fireArrowController.triggerPressed && playerController.triggerPressed)
                     {
                         //function
-                        stats.config.gameObject.GetComponent<FireArrowController>().isFireMode ^= true;
+                        fireArrowController.isOnFire ^= true;
 
                         stats.config.StartCoroutine(ShowMessage(stats,
                             "Fire Arrow: " +
                             (stats.config.GetComponent<FireArrowController>()
-                                .isFireMode
+                                .isOnFire
                                 ? "On"
                                 : "Off")));
                     }
 
-                    stats.config.GetComponent<FireArrowController>().triggerPressed = controller.triggerPressed;
+                    fireArrowController.triggerPressed = playerController.triggerPressed;
+
+                    if (__instance.isLoaded)
+                    {
+                        var projectileFireScript = __instance.Arrow.GetComponentInChildren<ProjectileFireScript>();
+                        if (fireArrowController.isOnFire != projectileFireScript.isOnFire)
+                        {
+                            if (fireArrowController.isOnFire)
+                                projectileFireScript.SetFireOn();
+                            else
+                                projectileFireScript.SetFireOff();
+                        }
+                    }
                 }
             }
         }
@@ -117,7 +129,7 @@ namespace TOGFireArrows
 
 
                 __instance.Arrow.GetComponentInChildren<ProjectileFireScript>().isOnFire =
-                    stats.config.gameObject.GetComponent<FireArrowController>().isFireMode;
+                    stats.config.gameObject.GetComponent<FireArrowController>().isOnFire;
             }
         }
     }
