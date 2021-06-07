@@ -1,0 +1,7 @@
+﻿{
+  "Mod_Name": "TOGFireArrows",
+  "Author": "lilhusky",
+  "dllName": "TOGFireArrows",
+  "className": "TOGFireArrowsPatch",
+  "startMethod": "Inject"
+}
